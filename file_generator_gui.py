@@ -5,10 +5,10 @@ import shutil
 import tempfile
 from io import BytesIO
 
-st.title("YDoc File Generator (.bin)")
+st.title("YDOC Firmware Update File Generator (.bin)")
 
 csv_file = st.file_uploader("Upload CSV File", type="csv")
-template_file = st.file_uploader("Upload Template File (.bin or .txt)", type=["bin", "txt"])
+template_file = st.file_uploader("Upload Template File (.bin)", type=["bin"])
 
 if csv_file and template_file:
     df = pd.read_csv(csv_file)
