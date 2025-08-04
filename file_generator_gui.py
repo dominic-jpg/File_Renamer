@@ -1,75 +1,46 @@
+import streamlit as st
+import pandas as pd
 import os
-import csv
 import shutil
-import tkinter as tk
-from tkinter import filedialog, messagebox
+from io import BytesIO
 
-def create_files_from_template(csv_path, template_path, output_folder):
-    try:
-        with open(csv_path, newline='') as csvfile:
-            reader = csv.DictReader(csvfile)
-            records = [(row["Borehole ID"].strip(), row["Current YDoc S/N"].strip()) for row in reader if row["Current YDoc S/N"].strip()]
+st.title("YDoc File Generator")
 
-        for borehole_id, serial in records:
-            borehole_folder = os.path.join(output_folder, borehole_id)
-            os.makedirs(borehole_folder, exist_ok=True)
-            new_filepath = os.path.join(borehole_folder, f"{serial}.bin")
-            shutil.copyfile(template_path, new_filepath)
+# Upload CSV
+csv_file = st.file_uploader("Upload CSV file", type="csv")
 
-        return f"✅ Successfully created {len(records)} .bin files in subfolders."
-    except Exception as e:
-        return f"❌ Error: {e}"
+# Upload template file
+template_file = st.file_uploader("Upload Template File (.bin)", type=["bin", "txt"])
 
-def run_gui():
-    root = tk.Tk()
-    root.title("YDoc File Generator")
+# Process when both files are uploaded
+if csv_file and template_file:
+    df = pd.read_csv(csv_file)
+    
+    # Validate required columns
+    if "Borehole ID" not in df.columns or "Current YDoc S/N" not in df.columns:
+        st.error("CSV must contain 'Borehole ID' and 'Current YDoc S/N' columns.")
+    else:
+        output_zip = BytesIO()
+        with shutil.make_archive("ydoc_output", 'zip', root_dir=None) as archive:
+            for _, row in df.iterrows():
+                borehole_id = str(row["Borehole ID"]).strip()
+                serial = str(row["Current YDoc S/N"]).strip()
 
-    def select_csv():
-        path = filedialog.askopenfilename(filetypes=[("CSV Files", "*.csv")])
-        if path:
-            csv_entry.delete(0, tk.END)
-            csv_entry.insert(0, path)
+                if not serial:
+                    continue
 
-    def select_template():
-        path = filedialog.askopenfilename(filetypes=[("BIN Files", "*.bin"), ("All Files", "*.*")])
-        if path:
-            template_entry.delete(0, tk.END)
-            template_entry.insert(0, path)
+                # Create in-memory subfolder and file
+                folder_path = f"{borehole_id}"
+                filename = f"{serial}.bin"
+                file_path = os.path.join(folder_path, filename)
 
-    def select_output():
-        path = filedialog.askdirectory()
-        if path:
-            output_entry.delete(0, tk.END)
-            output_entry.insert(0, path)
+                os.makedirs(folder_path, exist_ok=True)
+                with open(file_path, "wb") as f:
+                    f.write(template_file.getbuffer())
 
-    def on_run():
-        csv_path = csv_entry.get()
-        template_path = template_entry.get()
-        output_folder = output_entry.get()
-        if not all([csv_path, template_path, output_folder]):
-            messagebox.showerror("Missing Info", "Please select all required files and folder.")
-            return
-        result = create_files_from_template(csv_path, template_path, output_folder)
-        messagebox.showinfo("Result", result)
+            # Zip the entire structure
+            shutil.make_archive("ydoc_output", 'zip', ".")
 
-    tk.Label(root, text="CSV File:").grid(row=0, column=0, sticky="e")
-    csv_entry = tk.Entry(root, width=50)
-    csv_entry.grid(row=0, column=1)
-    tk.Button(root, text="Browse", command=select_csv).grid(row=0, column=2)
+        with open("ydoc_output.zip", "rb") as zip_file:
+            st.download_button("Download ZIP", zip_file, file_name="ydoc_files.zip")
 
-    tk.Label(root, text="Template .bin File:").grid(row=1, column=0, sticky="e")
-    template_entry = tk.Entry(root, width=50)
-    template_entry.grid(row=1, column=1)
-    tk.Button(root, text="Browse", command=select_template).grid(row=1, column=2)
-
-    tk.Label(root, text="Output Folder:").grid(row=2, column=0, sticky="e")
-    output_entry = tk.Entry(root, width=50)
-    output_entry.grid(row=2, column=1)
-    tk.Button(root, text="Browse", command=select_output).grid(row=2, column=2)
-
-    tk.Button(root, text="Generate Files", command=on_run, bg="green", fg="white").grid(row=3, column=1, pady=10)
-
-    root.mainloop()
-
-if __name__ == "__main__":
-    run_gui()
