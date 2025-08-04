@@ -10,7 +10,7 @@ st.title("📁 YDOC Firmware Update File Generator (.bin)")
 # Step 1: Upload CSV
 st.markdown("""
 ### Step 1: Upload CSV File
-Upload a `.csv` file containing columns for Borehole IDs and YDOC serial numbers.
+Upload a `.csv` file containing columns for Logger IDs and YDOC serial numbers in two seperate columns.
 """)
 csv_file = st.file_uploader("Choose your CSV file", type="csv")
 
