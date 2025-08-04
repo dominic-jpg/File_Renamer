@@ -29,7 +29,7 @@ if csv_file and template_file:
                 os.makedirs(folder_path, exist_ok=True)
 
                 # Write the file with .bin extension
-                file_path = os.path.join(folder_path, f"{serial}.bin")
+                file_path = os.path.join(folder_path, f"YDOC_{serial}.bin")
                 with open(file_path, "wb") as f:
                     f.write(template_file.getvalue())
 
