@@ -19,7 +19,8 @@ if csv_file and template_file:
         with tempfile.TemporaryDirectory() as temp_dir:
             for _, row in df.iterrows():
                 borehole_id = str(row["Borehole ID"]).strip()
-                serial = str(row["Current YDoc S/N"]).strip()
+                serial_raw = row["Current YDoc S/N"]
+                serial = str(int(float(serial_raw))) if pd.notna(serial_raw) else ""
 
                 if not borehole_id or not serial:
                     continue
