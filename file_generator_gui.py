@@ -27,7 +27,7 @@ if csv_file:
     st.markdown("""
     ### Step 3: Upload Template File
     Upload the firmware `.bin` file that will be duplicated and renamed for each serial number.
-    \nFor latest YDOC Firmware, go to: https://ydoc.biz/docs/datalogger-firmware/
+    <br>For latest YDOC Firmware, go to: https://ydoc.biz/docs/datalogger-firmware/
     """)
     template_file = st.file_uploader("Choose your Template (.bin) file", type=["bin"])
 
