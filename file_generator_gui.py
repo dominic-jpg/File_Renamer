@@ -20,8 +20,8 @@ if csv_file:
 
     # Step 2: Select Columns
     st.markdown("### Step 2: Select Column Headers")
-    bore_col = st.selectbox("Select the column for Borehole ID", column_options, key="bore_id_col")
-    serial_col = st.selectbox("Select the column for YDoc Serial Number", column_options, key="serial_col")
+    bore_col = st.selectbox("Select the column for Logger ID", column_options, key="bore_id_col")
+    serial_col = st.selectbox("Select the column for YDOC Serial Number", column_options, key="serial_col")
 
     # Step 3: Upload Template
     st.markdown("""
