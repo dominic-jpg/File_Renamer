@@ -14,20 +14,21 @@ Upload a `.csv` file containing columns for Borehole IDs and YDOC serial numbers
 """)
 csv_file = st.file_uploader("Choose your CSV file", type="csv")
 
-# Step 2: Upload Template
-st.markdown("""
-### Step 2: Upload Template File
-Upload the firmware `.bin` file that will be duplicated and renamed for each serial number.
-""")
-template_file = st.file_uploader("Choose your Template (.bin) file", type=["bin"])
-
 if csv_file:
     df = pd.read_csv(csv_file)
     column_options = list(df.columns)
 
-    st.markdown("### Step 3: Select Column Headers")
+    # Step 2: Select Columns
+    st.markdown("### Step 2: Select Column Headers")
     bore_col = st.selectbox("Select the column for Borehole ID", column_options, key="bore_id_col")
     serial_col = st.selectbox("Select the column for YDoc Serial Number", column_options, key="serial_col")
+
+    # Step 3: Upload Template
+    st.markdown("""
+    ### Step 3: Upload Template File
+    Upload the firmware `.bin` file that will be duplicated and renamed for each serial number.
+    """)
+    template_file = st.file_uploader("Choose your Template (.bin) file", type=["bin"])
 
     if template_file:
         with tempfile.TemporaryDirectory() as temp_dir:
